@@ -35,3 +35,177 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/* Global styles: same "dirty white" background as auth + toolbar styling */
+
+$color-dark-blue: #1a3a52;
+$color-orange: #ff8c42;
+$color-white-dirty: #f5f5f3;
+$color-toolbar-text-dark: #1a3a52;
+$color-toolbar-text-light: #ffffff;
+
+/* Apply background everywhere (body, app root, ion elements) */
+html, body, ion-app, ion-router-outlet, #app-root {
+  height: 100%;
+  background-color: $color-white-dirty !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure ion-content inherits the global background */
+ion-content {
+  --background: #{$color-white-dirty} !important;
+  background-color: #{$color-white-dirty} !important;
+}
+
+/* Ionic color variables */
+:root {
+  --ion-color-primary: #{$color-dark-blue};
+  --ion-color-primary-shade: #153146;
+  --ion-color-primary-tint: #294b63;
+  --ion-color-secondary: #{$color-orange};
+  --ion-background-color: #{$color-white-dirty};
+  --app-toolbar-height: 72px;
+
+  /* DEFAULT TOOLBAR COLORS: make all toolbars dark blue with white text */
+  --app-toolbar-bg: #{$color-dark-blue};
+  --app-toolbar-color: #{$color-toolbar-text-light};
+}
+
+/* Default toolbar appearance (now dark for all pages) */
+ion-toolbar {
+  height: var(--app-toolbar-height);
+  min-height: var(--app-toolbar-height);
+  --background: var(--app-toolbar-bg);
+  color: var(--app-toolbar-color);
+  position: relative;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(26,58,82,0.16);
+  z-index: 10;
+}
+
+/* Left: app logo (visible on non-auth pages) */
+ion-toolbar::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  background-image: url('/assets/logo.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Right: user icon (visible on non-auth pages) */
+ion-toolbar::after {
+  content: '';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background-image: url('/assets/icon/user-icon.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.12);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.16);
+}
+
+ion-toolbar::after:hover {
+  transform: translateY(-50%) scale(1.04);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.22);
+}
+
+/* Title styling (white on dark toolbar) */
+ion-toolbar ion-title,
+ion-toolbar .toolbar-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--app-toolbar-color);
+  margin: 0;
+}
+
+/* AUTH header variant: keep consistent (explicit) and hide pseudo-elements */
+ion-header.auth-header ion-toolbar {
+  --background: #{$color-dark-blue};
+  color: #{$color-toolbar-text-light};
+  box-shadow: 0 2px 12px rgba(26,58,82,0.16);
+}
+
+ion-header.auth-header ion-toolbar::before,
+ion-header.auth-header ion-toolbar::after {
+  display: none;
+}
+
+/* Tabs styling adapted for dark toolbar */
+ion-tab-bar {
+  --background: #{$color-dark-blue};
+  border-top: 1px solid rgba(255,255,255,0.04);
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: transparent;
+}
+
+ion-tab-button {
+  --color: rgba(255,255,255,0.75);
+  color: rgba(255,255,255,0.75);
+  --ripple-color: rgba(255,255,255,0.08);
+  padding: 8px 12px;
+  border-radius: 12px;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+/* Selected tab: dark-blue accent with orange indicator */
+ion-tab-button[aria-selected="true"] {
+  color: #ffffff;
+  background: rgba(255,255,255,0.06);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.16);
+}
+
+ion-tab-button[aria-selected="true"]::after {
+  content: '';
+  display: block;
+  margin-top: 6px;
+  width: 36%;
+  height: 3px;
+  background: #{$color-orange};
+  border-radius: 3px;
+  align-self: end;
+}
+
+/* Smaller screens adjustments */
+@media (max-width: 480px) {
+  :root { --app-toolbar-height: 64px; }
+  ion-toolbar { height: var(--app-toolbar-height); min-height: var(--app-toolbar-height); }
+  ion-toolbar::before { width: 40px; height: 40px; left: 12px; }
+  ion-toolbar::after { width: 36px; height: 36px; right: 12px; }
+  ion-toolbar ion-title { font-size: 16px; }
+  ion-tab-button { padding: 6px 10px; font-size: 13px; }
+}
+
+/* Helper: force background on any full-screen wrappers */
+.full-bg, .page-bg {
+  background-color: #{$color-white-dirty} !important;
+}

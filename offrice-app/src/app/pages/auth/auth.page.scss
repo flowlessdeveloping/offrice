@@ -40,10 +40,10 @@ margin-top: 30%;
   align-items: center;
   justify-content: center;
   gap: 24px;
+  transform: scale(2);
+  margin-bottom: 20%;
 
   .app-logo {
-    width: 360px;
-    height: 360px;
     object-fit: contain;
     animation: fadeInDown 0.6s ease-out;
   }
