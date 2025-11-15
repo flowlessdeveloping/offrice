@@ -96,7 +96,7 @@ ion-toolbar::before {
   transform: translateY(-50%);
   width: 44px;
   height: 44px;
-  background-image: url('/assets/logo.png');
+  background-image: url('/assets/logo-white.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -114,7 +114,7 @@ ion-toolbar::after {
   transform: translateY(-50%);
   width: 40px;
   height: 40px;
-  background-image: url('/assets/icon/user-icon.png');
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%23ffffff' d='M256 256c66.3 0 120-53.7 120-120S322.3 16 256 16 136 69.7 136 136s53.7 120 120 120zm0 48c-79.5 0-240 40-240 120v24c0 13.3 10.7 24 24 24h432c13.3 0 24-10.7 24-24v-24c0-80-160.5-120-240-120z'/></svg>");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -193,19 +193,4 @@ ion-tab-button[aria-selected="true"]::after {
   background: #{$color-orange};
   border-radius: 3px;
   align-self: end;
-}
-
-/* Smaller screens adjustments */
-@media (max-width: 480px) {
-  :root { --app-toolbar-height: 64px; }
-  ion-toolbar { height: var(--app-toolbar-height); min-height: var(--app-toolbar-height); }
-  ion-toolbar::before { width: 40px; height: 40px; left: 12px; }
-  ion-toolbar::after { width: 36px; height: 36px; right: 12px; }
-  ion-toolbar ion-title { font-size: 16px; }
-  ion-tab-button { padding: 6px 10px; font-size: 13px; }
-}
-
-/* Helper: force background on any full-screen wrappers */
-.full-bg, .page-bg {
-  background-color: #{$color-white-dirty} !important;
 }
