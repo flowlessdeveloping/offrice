@@ -4,13 +4,14 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton } from '@ionic/a
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { filter, take } from 'rxjs/operators';
+import { AppToolbarComponent } from 'src/app/shared/app-toolbar/app-toolbar.component';
 
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.page.html',
   styleUrls: ['./auth.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, IonButton]
+  imports: [AppToolbarComponent, IonButton, IonContent],
 })
 export class AuthPage implements OnInit {
   loading = false;

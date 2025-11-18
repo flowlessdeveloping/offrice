@@ -72,85 +72,6 @@ ion-content {
   --app-toolbar-color: #{$color-toolbar-text-light};
 }
 
-/* Default toolbar appearance (now dark for all pages) */
-ion-toolbar {
-  height: var(--app-toolbar-height);
-  min-height: var(--app-toolbar-height);
-  --background: var(--app-toolbar-bg);
-  color: var(--app-toolbar-color);
-  position: relative;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 12px rgba(26,58,82,0.16);
-  z-index: 10;
-}
-
-/* Left: app logo (visible on non-auth pages) */
-ion-toolbar::before {
-  content: '';
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 44px;
-  height: 44px;
-  background-image: url('/assets/logo-white.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.18);
-  border: 1px solid rgba(255,255,255,0.06);
-}
-
-/* Right: user icon (visible on non-auth pages) */
-ion-toolbar::after {
-  content: '';
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%23ffffff' d='M256 256c66.3 0 120-53.7 120-120S322.3 16 256 16 136 69.7 136 136s53.7 120 120 120zm0 48c-79.5 0-240 40-240 120v24c0 13.3 10.7 24 24 24h432c13.3 0 24-10.7 24-24v-24c0-80-160.5-120-240-120z'/></svg>");
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.12);
-  cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.16);
-}
-
-ion-toolbar::after:hover {
-  transform: translateY(-50%) scale(1.04);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.22);
-}
-
-/* Title styling (white on dark toolbar) */
-ion-toolbar ion-title,
-ion-toolbar .toolbar-title {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-  color: var(--app-toolbar-color);
-  margin: 0;
-}
-
-/* AUTH header variant: keep consistent (explicit) and hide pseudo-elements */
-ion-header.auth-header ion-toolbar {
-  --background: #{$color-dark-blue};
-  color: #{$color-toolbar-text-light};
-  box-shadow: 0 2px 12px rgba(26,58,82,0.16);
-}
-
-ion-header.auth-header ion-toolbar::before,
-ion-header.auth-header ion-toolbar::after {
-  display: none;
-}
 
 /* Tabs styling adapted for dark toolbar */
 ion-tab-bar {
@@ -193,4 +114,18 @@ ion-tab-button[aria-selected="true"]::after {
   background: #{$color-orange};
   border-radius: 3px;
   align-self: end;
+}
+
+/* quando la toolbar è globale (es. inserita in app.component.html),
+   evita che il contenuto venga coperto dalla toolbar */
+ion-content.page-has-toolbar {
+  padding-top: var(--app-toolbar-height);
+  box-sizing: border-box;
+}
+
+/* su schermi piccoli riduci il padding-top se necessario */
+@media (max-width: 480px) {
+  ion-content.page-has-toolbar {
+    padding-top: calc(var(--app-toolbar-height) - 8px);
+  }
 }

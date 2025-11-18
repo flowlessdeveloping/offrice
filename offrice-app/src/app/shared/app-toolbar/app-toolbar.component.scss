@@ -1,0 +1,118 @@
+$color-dark-blue: #1a3a52;
+$color-orange: #ff8c42;
+$color-white: #ffffff;
+
+.app-toolbar {
+  height: 72px;
+  min-height: 72px;
+  --background: #{$color-dark-blue};
+  color: #{$color-white};
+  position: relative;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(26, 58, 82, 0.2);
+  z-index: 10;
+  background: linear-gradient(135deg, #{$color-dark-blue} 0%, #0f2638 100%);
+
+  /* Left: app logo */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    background-image: url('/assets/logo-white.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 10px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+
+  &::before:hover {
+    transform: translateY(-50%) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  ion-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: #{$color-white};
+    margin: 0;
+    text-align: center;
+    flex: 1;
+  }
+}
+
+/* Profile icon (HTML element) */
+.profile-icon {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.08);
+  padding: 8px;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    color: #{$color-white};
+  }
+
+  &:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0 8px 20px rgba(255, 140, 66, 0.3));
+  }
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+  .app-toolbar {
+    height: 80px;
+    min-height: 80px;
+    padding: 0 32px;
+
+    &::before { width: 52px; height: 52px; left: 28px; }
+    ion-title { font-size: 22px; }
+  }
+
+  .profile-icon {
+    right: 28px;
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* Small screens */
+@media (max-width: 480px) {
+  .app-toolbar {
+    height: 64px;
+    min-height: 64px;
+    padding: 0 12px;
+
+    &::before { width: 40px; height: 40px; left: 12px; }
+    ion-title { font-size: 18px; }
+  }
+
+  .profile-icon {
+    right: 12px;
+    width: 40px;
+    height: 40px;
+  }
+}
