@@ -8,16 +8,13 @@
     </div>
 
     <!-- Error Message -->
-    <div *ngIf="errorMessage" class="error-banner">
+    <!-- Usare [hidden] invece di *ngIf per non richiedere CommonModule/NgIf -->
+    <div [hidden]="!errorMessage" class="error-banner">
       {{ errorMessage }}
     </div>
 
     <!-- Google Sign-In Button -->
-    <ion-button
-      expand="block"
-      class="btn-google"
-      (click)="googleSignIn()"
-      [disabled]="loading">
+    <ion-button expand="block" class="btn-google" (click)="googleSignIn()" [disabled]="loading">
       <img src="assets/icon/google-icon.png" alt="Google" class="google-icon" />
       {{ loading ? 'Accesso in corso...' : 'Accedi con Google' }}
     </ion-button>

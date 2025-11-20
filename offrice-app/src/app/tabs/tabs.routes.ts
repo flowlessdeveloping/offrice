@@ -17,6 +17,11 @@ export const routes: Routes = [
           import('../pages/my-reservations/my-reservations.page').then((m) => m.MyReservationsPage),
       },
       {
+        path: 'my-pantry',
+        loadComponent: () =>
+          import('../pages/my-pantry/my-pantry.page').then((m) => m.MyPantryPage),
+      },
+      {
         path: '',
         redirectTo: 'pantry',
         pathMatch: 'full',

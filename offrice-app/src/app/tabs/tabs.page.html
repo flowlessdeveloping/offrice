@@ -1,13 +1,20 @@
 <ion-tabs>
   <ion-tab-bar slot="bottom">
-    <ion-tab-button tab="pantry" href="/tabs/pantry">
-      <ion-icon aria-hidden="true" name="triangle"></ion-icon>
-      <ion-label>Dispensa</ion-label>
+
+    <ion-tab-button tab="my-pantry" href="/tabs/my-pantry" aria-label="La tua dispensa"
+      style="flex:1; max-width:none; --min-width:0; --padding-start:0; --padding-end:0;">
+      <ion-icon aria-hidden="false" [icon]="list"></ion-icon>
     </ion-tab-button>
 
-    <ion-tab-button tab="reservations" href="/tabs/reservations">
-      <ion-icon aria-hidden="true" name="ellipse"></ion-icon>
-      <ion-label>le mie prenotazioni</ion-label>
+    <ion-tab-button tab="pantry" href="/tabs/pantry" aria-label="Dispensa"
+      style="flex:1; max-width:none; --min-width:0; --padding-start:0; --padding-end:0;">
+      <ion-icon aria-hidden="false" [icon]="basket"></ion-icon>
     </ion-tab-button>
-    </ion-tab-bar>
+
+    <ion-tab-button tab="reservations" href="/tabs/reservations" aria-label="Le mie prenotazioni"
+      style="flex:1; max-width:none; --min-width:0; --padding-start:0; --padding-end:0;">
+      <ion-icon aria-hidden="false" [icon]="calendar"></ion-icon>
+    </ion-tab-button>
+
+  </ion-tab-bar>
 </ion-tabs>
