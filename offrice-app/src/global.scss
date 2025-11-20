@@ -45,11 +45,20 @@ $color-toolbar-text-dark: #1a3a52;
 $color-toolbar-text-light: #ffffff;
 
 /* Apply background everywhere (body, app root, ion elements) */
-html, body, ion-app, ion-router-outlet, #app-root {
+html,
+body,
+ion-app,
+ion-router-outlet,
+#app-root {
   height: 100%;
   background-color: $color-white-dirty !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+
+ion-icon {
+  color: #{$color-orange};
 }
 
 /* Ensure ion-content inherits the global background */
@@ -76,7 +85,7 @@ ion-content {
 /* Tabs styling adapted for dark toolbar */
 ion-tab-bar {
   --background: #{$color-dark-blue};
-  border-top: 1px solid rgba(255,255,255,0.04);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
   padding: 8px 10px;
   display: flex;
   align-items: center;
@@ -86,9 +95,9 @@ ion-tab-bar {
 }
 
 ion-tab-button {
-  --color: rgba(255,255,255,0.75);
-  color: rgba(255,255,255,0.75);
-  --ripple-color: rgba(255,255,255,0.08);
+  --color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.75);
+  --ripple-color: rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   transition: all 0.18s ease;
   display: flex;
@@ -100,8 +109,8 @@ ion-tab-button {
 /* Selected tab: dark-blue accent with orange indicator */
 ion-tab-button[aria-selected="true"] {
   color: #ffffff;
-  background: rgba(255,255,255,0.06);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.16);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
 }
 
 ion-tab-button[aria-selected="true"]::after {

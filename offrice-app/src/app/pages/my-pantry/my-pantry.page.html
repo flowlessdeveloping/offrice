@@ -1,6 +1,11 @@
 <app-toolbar title="La mia dispensa"></app-toolbar>
 
 <ion-content class="ion-padding">
-  <!-- Contenuto iniziale della tua dispensa -->
-  <p>Benvenuto nella tua dispensa.</p>
 </ion-content>
+
+<!-- Floating action button: + in basso a destra -->
+<ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-add">
+  <ion-fab-button (click)="goToAddItem()">
+    <ion-icon aria-hidden="false" [icon]="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

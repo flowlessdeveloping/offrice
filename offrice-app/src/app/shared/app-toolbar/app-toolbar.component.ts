@@ -7,16 +7,15 @@ import { AuthStateService } from '../../services/auth-state.service';
   selector: 'app-toolbar',
   templateUrl: './app-toolbar.component.html',
   styleUrls: ['./app-toolbar.component.scss'],
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, IonButton]
+  imports: [IonHeader, IonTitle, IonToolbar, CommonModule]
 })
 export class AppToolbarComponent implements OnInit {
   @Input() title: string = 'Offrice';
   showProfileIcon: boolean = false;
 
-  constructor(private authStateService: AuthStateService) {}
+  constructor(private authStateService: AuthStateService) { }
 
   ngOnInit() {
-    // Sottoscrivi allo stato di login e aggiorna showProfileIcon
     this.authStateService.isLoggedIn$.subscribe(isLoggedIn => {
       this.showProfileIcon = isLoggedIn;
     });
