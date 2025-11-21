@@ -21,6 +21,6 @@ export class MyPantryPage {
   public add = add;
 
   goToAddItem() {
-    this.router.navigate(['/add-item']);
+    this.router.navigate(['/tabs/add-item']);
   }
 }

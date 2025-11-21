@@ -59,7 +59,7 @@ export class AddItemPage implements OnInit {
   }
 
   goToDashboard() {
-    this.router.navigate(['/my-pantry']);
+    this.router.navigate(['/tabs/my-pantry']);
   }
 
   // semplice validazione e creazione oggetto ProductItem
@@ -121,7 +121,7 @@ export class AddItemPage implements OnInit {
       await this.productItemService.addItem(payload as Partial<ProductItem>);
       // breve feedback e navigazione
       console.log('Nuovo item creato su Firestore', payload);
-      this.router.navigate(['/my-pantry']);
+      this.router.navigate(['/tabs/my-pantry']);
     } catch (err) {
       console.error(err);
       this.errorMessage = 'Errore durante il salvataggio. Riprova.';
