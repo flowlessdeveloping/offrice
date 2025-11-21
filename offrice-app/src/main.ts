@@ -15,10 +15,14 @@ import { provideAuth, getAuth } from '@angular/fire/auth';
 // AGGIUNGI QUESTE IMPORTAZIONI
 import { provideStorage, getStorage } from '@angular/fire/storage';
 import { provideHttpClient } from '@angular/common/http';
+import { defineCustomElements } from '@ionic/pwa-elements/loader'; // <--- AGGIUNGI QUESTO
 
 if (environment.production) {
   enableProdMode();
 }
+
+// Chiama la funzione prima o dopo il bootstrap
+defineCustomElements(window); // <--- AGGIUNGI QUESTO
 
 bootstrapApplication(AppComponent, {
   providers: [
