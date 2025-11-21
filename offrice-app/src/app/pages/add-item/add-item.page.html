@@ -1,68 +1,62 @@
-<app-toolbar title="Crea nuovo elemento"></app-toolbar>
-<ion-content [fullscreen]="true" class="ion-padding">
-  <!-- pulsante back 
-  <div class="ion-margin-bottom">
-    <ion-fab vertical="top" horizontal="start" slot="fixed">
-      <ion-fab-button (click)="goToDashboard()" color="light">
-        <ion-icon aria-hidden="arrowBackCircle" [icon]="arrowBackCircle"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
-  </div>-->
+<app-toolbar title="Nuovo Prodotto"></app-toolbar>
 
-  <!-- form card -->
-  <ion-card class="transparent-card">
+<ion-content [fullscreen]="true">
+
+  <ion-card class="modern-card">
     <ion-card-content>
-      <ion-list lines="full" class="form-list">
 
-        <ion-item>
-          <ion-label position="stacked">Nome prodotto</ion-label>
-          <ion-input [(ngModel)]="itemForm.productName" placeholder="Es. Latte parziale, Pane" required></ion-input>
+      <!-- Form List -->
+      <ion-list class="ion-no-padding">
+
+        <ion-item lines="none">
+          <ion-label position="stacked">Cosa aggiungi?</ion-label>
+          <ion-input [(ngModel)]="itemForm.productName" placeholder="Es. Pasta, Latte..." required></ion-input>
         </ion-item>
 
-        <ion-item>
-          <ion-grid>
-            <ion-row>
-              <ion-col size="6">
-                <ion-item lines="none">
-                  <ion-label position="stacked">Quantità</ion-label>
-                  <ion-input type="number" [(ngModel)]="itemForm.quantity" placeholder="Es. 250" required></ion-input>
-                </ion-item>
-              </ion-col>
-              <ion-col size="6">
-                <ion-item lines="none">
-                  <ion-label position="stacked">Unità</ion-label>
-                  <ion-select [(ngModel)]="itemForm.unit" okText="Seleziona" cancelText="Annulla">
-                    <ion-select-option *ngFor="let u of units" [value]="u">{{u}}</ion-select-option>
-                  </ion-select>
-                </ion-item>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
+        <ion-grid class="ion-no-padding">
+          <ion-row>
+            <ion-col size="6" style="padding-right: 6px;">
+              <ion-item lines="none">
+                <ion-label position="stacked">Quantità</ion-label>
+                <ion-input type="number" [(ngModel)]="itemForm.quantity" placeholder="0" required></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size="6" style="padding-left: 6px;">
+              <ion-item lines="none">
+                <ion-label position="stacked">Unità</ion-label>
+                <ion-select [(ngModel)]="itemForm.unit" interface="popover">
+                  <ion-select-option *ngFor="let u of units" [value]="u">{{u}}</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <ion-item lines="none">
+          <ion-label position="stacked">Note (Opzionale)</ion-label>
+          <ion-textarea rows="3" [(ngModel)]="itemForm.description" placeholder="Scadenza, dettagli..."></ion-textarea>
         </ion-item>
 
-        <ion-item>
-          <ion-label position="stacked">Descrizione (opzionale)</ion-label>
-          <ion-textarea rows="3" [(ngModel)]="itemForm.description"
-            placeholder="Dettagli, es. confezione aperta oggi"></ion-textarea>
-        </ion-item>
-
-        <!-- RIMOSSO: Tags (separati da virgola) -->
       </ion-list>
 
-      <div class="ion-margin-top">
-        <ion-text color="danger" *ngIf="errorMessage">{{ errorMessage }}</ion-text>
+      <!-- Error Message -->
+      <div class="ion-margin-top" *ngIf="errorMessage">
+        <ion-text color="danger" class="error-text">{{ errorMessage }}</ion-text>
       </div>
 
+      <!-- Actions -->
       <div class="ion-margin-top">
-        <ion-button expand="block" color="primary" (click)="saveItem()" [disabled]="saving">
+        <ion-button expand="block" class="btn-save" (click)="saveItem()" [disabled]="saving">
           <ion-spinner *ngIf="saving" name="crescent"></ion-spinner>
-          <span *ngIf="!saving" style="color: white;">Condividi elemento</span>
+          <span *ngIf="!saving">Aggiungi alla Dispensa</span>
           <span *ngIf="saving">Salvataggio...</span>
         </ion-button>
 
-        <ion-button expand="block" fill="clear" color="medium" (click)="goToDashboard()"
-          [disabled]="saving">Annulla</ion-button>
+        <ion-button expand="block" fill="clear" class="btn-cancel" (click)="goToDashboard()" [disabled]="saving">
+          Annulla
+        </ion-button>
       </div>
+
     </ion-card-content>
   </ion-card>
 </ion-content>
