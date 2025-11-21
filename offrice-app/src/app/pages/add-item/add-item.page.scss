@@ -30,6 +30,54 @@ ion-card-content {
     padding: 30px 20px 20px;
 }
 
+/* Image Upload Styles */
+.image-upload-container {
+    width: 100%;
+    height: 180px;
+    background: #f2f4f8;
+    border-radius: 16px;
+    border: 2px dashed #d1d8e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.image-upload-container:active {
+    background: #e8ebf2;
+    border-color: var(--ion-color-primary);
+}
+
+.placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #95a5a6;
+}
+
+.placeholder ion-icon {
+    font-size: 48px;
+    margin-bottom: 8px;
+    color: var(--ion-color-primary);
+    opacity: 0.7;
+}
+
+.placeholder p {
+    margin: 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 /* Stile dei campi input: "Bubble" style */
 ion-list {
     background: transparent;

@@ -1,13 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonCard, IonCardContent, IonList, IonItem, IonLabel, IonInput, IonGrid, IonRow, IonCol, IonSelect, IonSelectOption, IonTextarea, IonButton, IonSpinner, IonText } from '@ionic/angular/standalone';
+import { IonContent, IonCard, IonCardContent, IonList, IonItem, IonLabel, IonInput, IonGrid, IonRow, IonCol, IonSelect, IonSelectOption, IonTextarea, IonButton, IonSpinner, IonText, IonIcon } from '@ionic/angular/standalone';
 import { AppToolbarComponent } from 'src/app/shared/app-toolbar/app-toolbar.component';
-import { arrowBackCircle } from 'ionicons/icons';
+import { arrowBackCircle, camera } from 'ionicons/icons';
 import { Router } from '@angular/router';
-import { ProductItem, QuantityUnit, ItemStatus } from 'src/app/model'; // <-- aggiunti i modelli
+import { ProductItem, QuantityUnit, ItemStatus } from 'src/app/model';
 import { ProductItemService } from 'src/app/services/product-item.service';
 import { AuthService } from 'src/app/services/auth.service';
+// Rimosse importazioni dirette di Camera e Storage
+// Importa il nuovo servizio
+import { PhotoService } from 'src/app/services/photo.service';
 
 @Component({
   selector: 'app-add-item',
@@ -33,25 +36,30 @@ import { AuthService } from 'src/app/services/auth.service';
     IonTextarea,
     IonButton,
     IonSpinner,
-    IonText
+    IonText,
+    IonIcon
   ]
 })
 export class AddItemPage implements OnInit {
 
   public arrowBackCircle = arrowBackCircle;
+  public camera = camera;
 
-  // nuovo stato locale per il form (rimosse images, expiryDate, ownerFirstName, ownerLastName, tags)
   public units = Object.values(QuantityUnit);
+  public tempImage: string | undefined;
+
   public itemForm: Partial<ProductItem> = {
     productName: '',
     quantity: 0,
     unit: QuantityUnit.GRAM,
     description: ''
-    // tags non gestito nel form per ora
   };
 
   public saving = false;
   public errorMessage = '';
+
+  // Inietta il PhotoService invece di Storage direttamente
+  private photoService = inject(PhotoService);
 
   constructor(private router: Router, private productItemService: ProductItemService, private auth: AuthService) { }
 
@@ -62,10 +70,23 @@ export class AddItemPage implements OnInit {
     this.router.navigate(['/tabs/my-pantry']);
   }
 
-  // semplice validazione e creazione oggetto ProductItem
+  async addPhoto() {
+    try {
+      // Usa il servizio per scattare (la configurazione di compressione è centralizzata lì)
+      const image = await this.photoService.takePhoto();
+
+      if (image.base64String) {
+        this.tempImage = 'data:image/jpeg;base64,' + image.base64String;
+      }
+    } catch (error) {
+      console.log('Nessuna foto selezionata o errore camera', error);
+    }
+  }
+
+  // Rimosso il metodo uploadImageToStorage (ora è nel servizio)
+
   async saveItem() {
     this.errorMessage = '';
-    // recupera utente autenticato
     const authUser = this.auth.getCurrentUserValue();
 
     if (!authUser) {
@@ -94,7 +115,15 @@ export class AddItemPage implements OnInit {
 
     this.saving = true;
     try {
-      const uid = this.auth.getUserId(); // ownerId opzionale
+      const uid = this.auth.getUserId();
+
+      // 1. Se c'è un'immagine temporanea, caricala
+      let imageUrl = '';
+      if (this.tempImage) { // Non serve più controllare uid per il path
+        // Rimuovi il secondo parametro 'path'
+        imageUrl = await this.photoService.uploadImage(this.tempImage);
+      }
+
       const rawPayload: Partial<ProductItem> = {
         ownerId: uid || undefined,
         ownerFirstName: ownerFirstName,
@@ -103,13 +132,12 @@ export class AddItemPage implements OnInit {
         quantity: this.itemForm.quantity!,
         unit: this.itemForm.unit || QuantityUnit.GRAM,
         description: this.itemForm.description,
-        // tags removed from payload (kept in models for future)
+        // 2. Salva l'URL restituito da Storage
+        images: imageUrl ? [imageUrl] : [],
         location: this.itemForm.location,
         status: ItemStatus.AVAILABLE
-        // createdAt sarà impostato dal servizio (serverTimestamp)
       };
 
-      // remove undefined fields to avoid Firestore error
       const payload: Record<string, any> = { ...rawPayload };
       Object.keys(payload).forEach((k) => {
         if (payload[k] === undefined) {
@@ -119,7 +147,7 @@ export class AddItemPage implements OnInit {
 
       console.log('Payload inviato a Firestore:', payload);
       await this.productItemService.addItem(payload as Partial<ProductItem>);
-      // breve feedback e navigazione
+
       console.log('Nuovo item creato su Firestore', payload);
       this.router.navigate(['/tabs/my-pantry']);
     } catch (err) {

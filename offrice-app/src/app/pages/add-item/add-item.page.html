@@ -5,6 +5,15 @@
   <ion-card class="modern-card">
     <ion-card-content>
 
+      <!-- Image Upload Section -->
+      <div class="image-upload-container" (click)="addPhoto()">
+        <div *ngIf="!tempImage" class="placeholder">
+          <ion-icon [icon]="camera"></ion-icon>
+          <p>Aggiungi foto</p>
+        </div>
+        <img *ngIf="tempImage" [src]="tempImage" class="preview-image" />
+      </div>
+
       <!-- Form List -->
       <ion-list class="ion-no-padding">
 
