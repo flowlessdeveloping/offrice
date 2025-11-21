@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonIcon, IonFabButton, IonFab, IonCard, IonCardContent, IonList, IonItem, IonLabel, IonInput, IonGrid, IonRow, IonCol, IonSelect, IonSelectOption, IonTextarea, IonButton, IonSpinner, IonText } from '@ionic/angular/standalone';
+import { IonContent, IonCard, IonCardContent, IonList, IonItem, IonLabel, IonInput, IonGrid, IonRow, IonCol, IonSelect, IonSelectOption, IonTextarea, IonButton, IonSpinner, IonText } from '@ionic/angular/standalone';
 import { AppToolbarComponent } from 'src/app/shared/app-toolbar/app-toolbar.component';
 import { arrowBackCircle } from 'ionicons/icons';
 import { Router } from '@angular/router';
@@ -19,9 +19,6 @@ import { AuthService } from 'src/app/services/auth.service';
     CommonModule,
     FormsModule,
     AppToolbarComponent,
-    IonIcon,
-    IonFab,
-    IonFabButton,
     IonCard,
     IonCardContent,
     IonList,
@@ -37,7 +34,6 @@ import { AuthService } from 'src/app/services/auth.service';
     IonButton,
     IonSpinner,
     IonText
-    // rimosso IonDatetime perché non serve più
   ]
 })
 export class AddItemPage implements OnInit {
