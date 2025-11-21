@@ -2,6 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+// Importa environment
+import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -9,9 +11,9 @@ import { firstValueFrom } from 'rxjs';
 export class PhotoService {
     private http = inject(HttpClient);
 
-    // CONFIGURAZIONE CLOUDINARY
-    private cloudName = 'IL_TUO_CLOUD_NAME'; // <--- INSERISCI QUI IL NOME (dalla dashboard)
-    private uploadPreset = 'IL_TUO_PRESET';  // <--- INSERISCI QUI IL PRESET (es. offrice_preset)
+    // Leggi la configurazione dall'environment
+    private cloudName = environment.cloudinary.cloudName;
+    private uploadPreset = environment.cloudinary.uploadPreset;
 
     constructor() { }
 
