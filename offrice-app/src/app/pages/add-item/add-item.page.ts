@@ -1,15 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonCard, IonCardContent, IonList, IonItem, IonLabel, IonInput, IonGrid, IonRow, IonCol, IonSelect, IonSelectOption, IonTextarea, IonButton, IonSpinner, IonText, IonIcon } from '@ionic/angular/standalone';
+// Aggiungi ToastController agli import
+import { IonContent, IonCard, IonCardContent, IonList, IonItem, IonLabel, IonInput, IonGrid, IonRow, IonCol, IonSelect, IonSelectOption, IonTextarea, IonButton, IonSpinner, IonText, IonIcon, ToastController } from '@ionic/angular/standalone';
 import { AppToolbarComponent } from 'src/app/shared/app-toolbar/app-toolbar.component';
 import { arrowBackCircle, camera } from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { ProductItem, QuantityUnit, ItemStatus } from 'src/app/model';
 import { ProductItemService } from 'src/app/services/product-item.service';
 import { AuthService } from 'src/app/services/auth.service';
-// Rimosse importazioni dirette di Camera e Storage
-// Importa il nuovo servizio
 import { PhotoService } from 'src/app/services/photo.service';
 
 @Component({
@@ -38,6 +37,7 @@ import { PhotoService } from 'src/app/services/photo.service';
     IonSpinner,
     IonText,
     IonIcon
+    // ToastController non va qui negli imports, ma è un provider (già incluso in Ionic)
   ]
 })
 export class AddItemPage implements OnInit {
@@ -48,18 +48,24 @@ export class AddItemPage implements OnInit {
   public units = Object.values(QuantityUnit);
   public tempImage: string | undefined;
 
-  public itemForm: Partial<ProductItem> = {
+  // Definisco lo stato iniziale per poterlo resettare facilmente
+  private initialFormState: Partial<ProductItem> = {
     productName: '',
     quantity: 0,
     unit: QuantityUnit.GRAM,
-    description: ''
+    description: '',
+    location: ''
   };
+
+  // Inizializzo il form copiando lo stato iniziale
+  public itemForm: Partial<ProductItem> = { ...this.initialFormState };
 
   public saving = false;
   public errorMessage = '';
 
-  // Inietta il PhotoService invece di Storage direttamente
   private photoService = inject(PhotoService);
+  // Inietta il ToastController
+  private toastController = inject(ToastController);
 
   constructor(private router: Router, private productItemService: ProductItemService, private auth: AuthService) { }
 
@@ -72,9 +78,7 @@ export class AddItemPage implements OnInit {
 
   async addPhoto() {
     try {
-      // Usa il servizio per scattare (la configurazione di compressione è centralizzata lì)
       const image = await this.photoService.takePhoto();
-
       if (image.base64String) {
         this.tempImage = 'data:image/jpeg;base64,' + image.base64String;
       }
@@ -82,8 +86,6 @@ export class AddItemPage implements OnInit {
       console.log('Nessuna foto selezionata o errore camera', error);
     }
   }
-
-  // Rimosso il metodo uploadImageToStorage (ora è nel servizio)
 
   async saveItem() {
     this.errorMessage = '';
@@ -94,7 +96,6 @@ export class AddItemPage implements OnInit {
       return;
     }
 
-    // estrai nome e cognome da displayName (fallback su email)
     let ownerFirstName = '';
     let ownerLastName = '';
     const dn = (authUser.displayName || '').trim();
@@ -106,10 +107,8 @@ export class AddItemPage implements OnInit {
       ownerFirstName = authUser.email.split('@')[0];
     }
 
-    // validazione minima: prodotto, quantità > 0
     if (!this.itemForm.productName || !this.itemForm.quantity || this.itemForm.quantity <= 0) {
       this.errorMessage = 'Compila i campi obbligatori: prodotto e quantità (>0).';
-      console.warn('Campi obbligatori mancanti: productName, quantity');
       return;
     }
 
@@ -117,10 +116,8 @@ export class AddItemPage implements OnInit {
     try {
       const uid = this.auth.getUserId();
 
-      // 1. Se c'è un'immagine temporanea, caricala
       let imageUrl = '';
-      if (this.tempImage) { // Non serve più controllare uid per il path
-        // Rimuovi il secondo parametro 'path'
+      if (this.tempImage) {
         imageUrl = await this.photoService.uploadImage(this.tempImage);
       }
 
@@ -132,7 +129,6 @@ export class AddItemPage implements OnInit {
         quantity: this.itemForm.quantity!,
         unit: this.itemForm.unit || QuantityUnit.GRAM,
         description: this.itemForm.description,
-        // 2. Salva l'URL restituito da Storage
         images: imageUrl ? [imageUrl] : [],
         location: this.itemForm.location,
         status: ItemStatus.AVAILABLE
@@ -145,17 +141,40 @@ export class AddItemPage implements OnInit {
         }
       });
 
-      console.log('Payload inviato a Firestore:', payload);
       await this.productItemService.addItem(payload as Partial<ProductItem>);
 
-      console.log('Nuovo item creato su Firestore', payload);
+      // 1. Mostra il messaggio di successo
+      await this.presentToast('Prodotto caricato con successo!');
+
+      // 2. Resetta il form e l'immagine
+      this.resetForm();
+
+      // 3. Naviga alla dashboard
       this.router.navigate(['/tabs/my-pantry']);
+
     } catch (err) {
       console.error(err);
       this.errorMessage = 'Errore durante il salvataggio. Riprova.';
     } finally {
       this.saving = false;
     }
+  }
+
+  // Funzione helper per resettare tutto
+  private resetForm() {
+    this.itemForm = { ...this.initialFormState };
+    this.tempImage = undefined;
+    this.errorMessage = '';
+  }
+
+  // Funzione helper per mostrare il Toast
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2000, // Durata del toast in millisecondi
+      position: 'top' // Posizione del toast
+    });
+    await toast.present();
   }
 
 }
