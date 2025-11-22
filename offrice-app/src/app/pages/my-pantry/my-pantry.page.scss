@@ -1,1 +1,165 @@
 /* Stili per la pagina MyPantry */
+$color-dark-blue: #1a3a52;
+$color-orange: #ff8c42;
+
+// Sfondo generale della pagina
+.main-content {
+    --background: #f4f5f8;
+}
+
+// Contenitore del Segment (Tab)
+.segment-container {
+    padding: 16px;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+// Wrapper del contenuto principale
+.content-wrapper {
+    padding: 16px;
+    padding-bottom: 80px; // Spazio per il FAB in basso
+}
+
+// Classe di utilità per margine (usata nello spinner)
+.mt-5 {
+    margin-top: 3rem;
+}
+
+// Rimuovi padding e background dalla lista
+.pantry-list {
+    background: transparent;
+    padding: 0;
+}
+
+// Stile dell'elemento scorrevole (la card esterna)
+.pantry-sliding-item {
+    margin-bottom: 12px;
+    border-radius: 16px;
+    background: transparent;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+// Stile dell'item interno
+.pantry-item {
+    --background: #ffffff;
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+    border-radius: 16px;
+}
+
+// Contenitore Immagine/Icona
+.item-thumbnail-container {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-right: 16px;
+    background-color: #f0f2f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+// Immagine reale
+.item-thumbnail-container .real-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+// Placeholder con icona
+.item-thumbnail-container .icon-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.item-thumbnail-container .icon-placeholder ion-icon {
+    font-size: 28px;
+    color: var(--ion-color-medium);
+    opacity: 0.7;
+}
+
+// Titolo del prodotto
+.item-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #{$color-dark-blue};
+    margin-bottom: 6px;
+}
+
+// Dettagli (Quantità e Status)
+.item-details {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-badge {
+    background-color: var(--ion-color-light);
+    color: var(--ion-color-medium);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-text {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-text.available {
+    color: var(--ion-color-success);
+}
+
+// Stato vuoto (Empty State)
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 60px;
+}
+
+.empty-state .icon-circle {
+    width: 80px;
+    height: 80px;
+    background: var(--ion-color-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.empty-state .icon-circle ion-icon {
+    font-size: 40px;
+    color: var(--ion-color-medium);
+}
+
+.empty-state h3 {
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    margin: 0 0 8px 0;
+}
+
+.empty-state p {
+    color: var(--ion-color-medium);
+    margin: 0 0 24px 0;
+}
+
+// Suggerimento visivo per lo swipe (i tre puntini)
+.swipe-hint {
+    opacity: 0.3;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}

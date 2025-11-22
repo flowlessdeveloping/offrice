@@ -1,10 +1,103 @@
 <app-toolbar title="La mia dispensa"></app-toolbar>
 
-<ion-content class="ion-padding">
+<ion-content [fullscreen]="true" class="main-content">
+
+  <!-- SELETTORE TAB (Segment Moderno) -->
+  <div class="segment-container">
+    <ion-segment [(ngModel)]="currentView" (ionChange)="ionViewWillEnter()" mode="ios">
+      <ion-segment-button value="pantry">
+        <ion-label>Prodotti</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="reservations">
+        <ion-label>Prenotazioni</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <!-- SEZIONE 1: LA MIA DISPENSA -->
+  <div *ngIf="currentView === 'pantry'" class="content-wrapper">
+
+    <!-- Spinner caricamento -->
+    <div *ngIf="isLoading" class="ion-text-center ion-padding mt-5">
+      <ion-spinner color="primary"></ion-spinner>
+    </div>
+
+    <!-- Lista vuota -->
+    <div *ngIf="!isLoading && myItems.length === 0" class="empty-state">
+      <div class="icon-circle">
+        <ion-icon [icon]="pricetag"></ion-icon>
+      </div>
+      <h3>Dispensa vuota</h3>
+      <p>Inizia aggiungendo il tuo primo prodotto.</p>
+      <ion-button fill="solid" shape="round" (click)="goToAddItem()">
+        <ion-icon slot="start" [icon]="add"></ion-icon>
+        Aggiungi Prodotto
+      </ion-button>
+    </div>
+
+    <!-- Lista Prodotti (Stile Card) -->
+    <ion-list *ngIf="!isLoading && myItems.length > 0" class="pantry-list">
+
+      <ion-item-sliding *ngFor="let item of myItems" class="pantry-sliding-item">
+
+        <ion-item lines="none" detail="false" class="pantry-item">
+
+          <!-- Thumbnail Intelligente -->
+          <div slot="start" class="item-thumbnail-container">
+            <!-- Se c'è l'immagine -->
+            <img *ngIf="item.images && item.images.length > 0" [src]="item.images[0]" class="real-image" />
+
+            <!-- Se NON c'è l'immagine: Icona -->
+            <div *ngIf="!item.images || item.images.length === 0" class="icon-placeholder">
+              <ion-icon [icon]="fastFood"></ion-icon>
+            </div>
+          </div>
+
+          <ion-label class="ion-text-wrap">
+            <h2 class="item-title">{{ item.productName }}</h2>
+            <div class="item-details">
+              <span class="quantity-badge">{{ item.quantity }} {{ item.unit }}</span>
+              <span *ngIf="item.status" class="status-text available">
+                {{ item.status }}
+              </span>
+            </div>
+          </ion-label>
+
+          <!-- Indicatore swipe (opzionale, visivo) -->
+          <div slot="end" class="swipe-hint">
+            <!-- CAMBIA QUESTA RIGA: usa [icon] invece di name -->
+            <ion-icon [icon]="ellipsisVertical" color="medium"></ion-icon>
+          </div>
+        </ion-item>
+
+        <!-- Opzioni Swipe -->
+        <ion-item-options side="end">
+          <ion-item-option color="light" (click)="editItem(item)">
+            <ion-icon slot="icon-only" [icon]="create" color="primary"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="danger" (click)="confirmDelete(item)">
+            <ion-icon slot="icon-only" [icon]="trash"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+
+      </ion-item-sliding>
+
+    </ion-list>
+  </div>
+
+  <!-- SEZIONE 2: PRENOTAZIONI -->
+  <div *ngIf="currentView === 'reservations'" class="content-wrapper ion-text-center">
+    <div class="empty-state">
+      <p class="ion-text-muted">Qui vedrai la lista delle tue prenotazioni.</p>
+      <p style="font-size: 0.8rem;">(Funzionalità in arrivo)</p>
+    </div>
+  </div>
+
 </ion-content>
 
-<ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-add">
-  <ion-fab-button (click)="goToAddItem()">
-    <ion-icon aria-hidden="false" [icon]="add"></ion-icon>
+<!-- FAB Button -->
+<ion-fab *ngIf="currentView === 'pantry'" vertical="bottom" horizontal="end" slot="fixed" class="fab-add">
+  <ion-fab-button (click)="goToAddItem()" color="primary">
+    <ion-icon [icon]="add"></ion-icon>
   </ion-fab-button>
 </ion-fab>
