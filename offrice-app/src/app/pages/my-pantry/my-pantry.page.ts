@@ -1,21 +1,19 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core'; // Aggiungi OnDestroy
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonButton, IonFab, IonFabButton, IonIcon,
   IonSegment, IonSegmentButton, IonLabel, IonList, IonItem, IonThumbnail,
   IonItemSliding, IonItemOptions, IonItemOption, IonText, IonSpinner,
-  AlertController, ToastController, ViewWillEnter
+  AlertController, ToastController, ViewWillEnter, ActionSheetController
 } from '@ionic/angular/standalone';
-import { add, trash, create, pricetag, fastFood, ellipsisVertical } from 'ionicons/icons'; // <--- Aggiungi ellipsisVertical
+import { add, trash, create, pricetag, fastFood, ellipsisVertical, close } from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { AppToolbarComponent } from 'src/app/shared/app-toolbar/app-toolbar.component';
 import { ProductItemService } from 'src/app/services/product-item.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { ProductItem } from 'src/app/model';
-
-// Se hai già il componente prenotazioni importalo, altrimenti lascia stare per ora
-// import { MyReservationsComponent } from ...
+import { Unsubscribe } from 'firebase/firestore'; // Importa il tipo Unsubscribe
 
 @Component({
   selector: 'app-my-pantry',
@@ -25,23 +23,21 @@ import { ProductItem } from 'src/app/model';
   imports: [
     IonContent, CommonModule, FormsModule, AppToolbarComponent,
     IonFab, IonFabButton, IonIcon, IonSegment, IonSegmentButton, IonLabel,
-    IonList, IonItem, IonThumbnail, IonItemSliding, IonItemOptions, IonItemOption,
-    IonText, IonSpinner, IonButton
-    // Aggiungi qui MyReservationsComponent quando lo avrai
+    IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
+    IonSpinner, IonButton
   ]
 })
-export class MyPantryPage implements OnInit, ViewWillEnter {
+export class MyPantryPage implements OnInit, ViewWillEnter, OnDestroy { // Aggiungi OnDestroy
 
   public add = add;
   public trash = trash;
   public create = create;
   public pricetag = pricetag;
   public fastFood = fastFood;
-  public ellipsisVertical = ellipsisVertical; // <--- Aggiungi questa riga
+  public ellipsisVertical = ellipsisVertical;
+  public close = close;
 
-  // Gestisce quale tab è attiva: 'pantry' o 'reservations'
   public currentView: 'pantry' | 'reservations' = 'pantry';
-
   public myItems: ProductItem[] = [];
   public isLoading = true;
 
@@ -50,42 +46,71 @@ export class MyPantryPage implements OnInit, ViewWillEnter {
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
+  private actionSheetCtrl = inject(ActionSheetController);
+
+  // Variabile per memorizzare la funzione di stop del listener
+  private itemsUnsubscribe: Unsubscribe | null = null;
 
   constructor() { }
 
   ngOnInit() {
-    // Caricamento iniziale
+    // ngOnInit viene chiamato solo una volta alla creazione.
+    // Lasciamo il caricamento a ionViewWillEnter per gestire i ritorni.
   }
 
-  // ViewWillEnter viene chiamato ogni volta che la pagina diventa visibile
-  // Utile per ricaricare la lista se torni dalla pagina "Aggiungi"
+  // Questo metodo viene eseguito OGNI VOLTA che la pagina diventa visibile
   ionViewWillEnter() {
+    // Se siamo sulla tab dispensa, ricarica i dati
     if (this.currentView === 'pantry') {
-      this.loadMyItems();
+      this.startListening();
     }
   }
 
-  async loadMyItems() {
+  // Quando cambi tab o esci dalla pagina
+  ionViewWillLeave() {
+    this.stopListening();
+  }
+
+  // Quando il componente viene distrutto definitivamente
+  ngOnDestroy() {
+    this.stopListening();
+  }
+
+  startListening() {
+    // Se c'è già un ascolto attivo, non ne creare un altro
+    if (this.itemsUnsubscribe) return;
+
     this.isLoading = true;
     const uid = this.auth.getUserId();
+
     if (uid) {
-      this.myItems = await this.productService.getMyItems(uid);
+      // Ci abboniamo alle modifiche
+      this.itemsUnsubscribe = this.productService.subscribeToMyItems(uid, (items) => {
+        // Questa funzione viene chiamata AUTOMATICAMENTE ogni volta che il DB cambia
+        this.myItems = items;
+        this.isLoading = false;
+        console.log('Lista aggiornata in tempo reale!', items.length);
+      });
+    } else {
+      this.isLoading = false;
     }
-    this.isLoading = false;
+  }
+
+  stopListening() {
+    if (this.itemsUnsubscribe) {
+      this.itemsUnsubscribe(); // Ferma l'ascolto di Firebase
+      this.itemsUnsubscribe = null;
+    }
   }
 
   goToAddItem() {
     this.router.navigate(['/add-item']);
   }
 
-  // Funzione per modificare (per ora solo log)
   editItem(item: ProductItem) {
-    console.log('Modifica item:', item);
-    // In futuro: this.router.navigate(['/edit-item', item.id]);
-    this.presentToast('Funzionalità modifica in arrivo!');
+    this.router.navigate(['/add-item'], { queryParams: { id: item.id } });
   }
 
-  // Funzione per eliminare con conferma
   async confirmDelete(item: ProductItem) {
     const alert = await this.alertCtrl.create({
       header: 'Elimina prodotto',
@@ -106,9 +131,8 @@ export class MyPantryPage implements OnInit, ViewWillEnter {
     if (!item.id) return;
     try {
       await this.productService.deleteItem(item.id);
-      // Rimuovi localmente dalla lista per non ricaricare tutto
-      this.myItems = this.myItems.filter(i => i.id !== item.id);
       this.presentToast('Prodotto eliminato.');
+      // Non serve più: this.myItems = this.myItems.filter(...) 
     } catch (error) {
       console.error(error);
       this.presentToast('Errore durante l\'eliminazione.');
@@ -122,5 +146,37 @@ export class MyPantryPage implements OnInit, ViewWillEnter {
       position: 'bottom'
     });
     toast.present();
+  }
+
+  async openOptions(item: ProductItem) {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: item.productName,
+      buttons: [
+        {
+          text: 'Modifica',
+          icon: this.create,
+          cssClass: 'action-sheet-edit-btn', // Classe personalizzata per il colore blu
+          handler: () => {
+            this.editItem(item);
+          }
+        },
+        {
+          text: 'Elimina',
+          role: 'destructive',
+          icon: this.trash,
+          handler: () => {
+            this.confirmDelete(item);
+          }
+        },
+        {
+          text: 'Annulla',
+          icon: this.close,
+          role: 'cancel',
+          handler: () => { }
+        }
+      ]
+    });
+
+    await actionSheet.present();
   }
 }

@@ -1,11 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// Aggiungi ToastController agli import
 import { IonContent, IonCard, IonCardContent, IonList, IonItem, IonLabel, IonInput, IonGrid, IonRow, IonCol, IonSelect, IonSelectOption, IonTextarea, IonButton, IonSpinner, IonText, IonIcon, ToastController } from '@ionic/angular/standalone';
 import { AppToolbarComponent } from 'src/app/shared/app-toolbar/app-toolbar.component';
 import { arrowBackCircle, camera } from 'ionicons/icons';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ProductItem, QuantityUnit, ItemStatus } from 'src/app/model';
 import { ProductItemService } from 'src/app/services/product-item.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -37,7 +36,6 @@ import { PhotoService } from 'src/app/services/photo.service';
     IonSpinner,
     IonText,
     IonIcon
-    // ToastController non va qui negli imports, ma è un provider (già incluso in Ionic)
   ]
 })
 export class AddItemPage implements OnInit {
@@ -47,6 +45,12 @@ export class AddItemPage implements OnInit {
 
   public units = Object.values(QuantityUnit);
   public tempImage: string | undefined;
+
+  // --- VARIABILI MANCANTI AGGIUNTE QUI ---
+  public pageTitle = 'Nuovo Prodotto';
+  public isEditing = false;
+  private itemId: string | null = null;
+  // ---------------------------------------
 
   // Definisco lo stato iniziale per poterlo resettare facilmente
   private initialFormState: Partial<ProductItem> = {
@@ -64,12 +68,25 @@ export class AddItemPage implements OnInit {
   public errorMessage = '';
 
   private photoService = inject(PhotoService);
-  // Inietta il ToastController
   private toastController = inject(ToastController);
+  private route = inject(ActivatedRoute);
 
   constructor(private router: Router, private productItemService: ProductItemService, private auth: AuthService) { }
 
   ngOnInit() {
+    // Controlla se ci sono parametri nell'URL
+    this.route.queryParams.subscribe(async params => {
+      if (params['id']) {
+        // MODALITÀ MODIFICA
+        this.itemId = params['id'];
+        this.isEditing = true;
+        this.pageTitle = 'Modifica Prodotto';
+        await this.loadItemData(this.itemId!);
+      } else {
+        // MODALITÀ CREAZIONE (Reset)
+        this.resetForm();
+      }
+    });
   }
 
   goToDashboard() {
@@ -84,6 +101,34 @@ export class AddItemPage implements OnInit {
       }
     } catch (error) {
       console.log('Nessuna foto selezionata o errore camera', error);
+    }
+  }
+
+  // Carica i dati dal DB e riempie il form
+  async loadItemData(id: string) {
+    this.saving = true;
+    try {
+      const item = await this.productItemService.getItemById(id);
+      if (item) {
+        // Popola il form
+        this.itemForm = {
+          productName: item.productName,
+          quantity: item.quantity,
+          unit: item.unit,
+          description: item.description || '',
+          location: item.location || ''
+        };
+
+        // Gestione Immagine
+        if (item.images && item.images.length > 0) {
+          this.tempImage = item.images[0];
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      this.presentToast('Errore nel caricamento del prodotto.');
+    } finally {
+      this.saving = false;
     }
   }
 
@@ -114,67 +159,78 @@ export class AddItemPage implements OnInit {
 
     this.saving = true;
     try {
-      const uid = this.auth.getUserId();
-
+      // Gestione Immagine (Upload solo se è cambiata ed è base64)
       let imageUrl = '';
+
+      // Se c'è un'immagine
       if (this.tempImage) {
-        imageUrl = await this.photoService.uploadImage(this.tempImage);
+        // Se inizia con 'http', è un URL già esistente (non ricompriamo)
+        if (this.tempImage.startsWith('http')) {
+          imageUrl = this.tempImage;
+        } else {
+          // Altrimenti è base64, carichiamo su Cloudinary
+          imageUrl = await this.photoService.uploadImage(this.tempImage);
+        }
       }
 
-      const rawPayload: Partial<ProductItem> = {
-        ownerId: uid || undefined,
-        ownerFirstName: ownerFirstName,
-        ownerLastName: ownerLastName,
+      // Prepara il payload base
+      const payload: Partial<ProductItem> = {
         productName: this.itemForm.productName!.trim(),
         quantity: this.itemForm.quantity!,
         unit: this.itemForm.unit || QuantityUnit.GRAM,
         description: this.itemForm.description,
         images: imageUrl ? [imageUrl] : [],
         location: this.itemForm.location,
-        status: ItemStatus.AVAILABLE
       };
 
-      const payload: Record<string, any> = { ...rawPayload };
-      Object.keys(payload).forEach((k) => {
-        if (payload[k] === undefined) {
-          delete payload[k];
-        }
-      });
+      if (this.isEditing && this.itemId) {
+        // --- AGGIORNAMENTO ---
+        await this.productItemService.updateItem(this.itemId, payload);
+        await this.presentToast('Prodotto aggiornato!');
+      } else {
+        // --- CREAZIONE ---
+        const uid = this.auth.getUserId();
 
-      await this.productItemService.addItem(payload as Partial<ProductItem>);
+        const createPayload = {
+          ...payload,
+          ownerId: uid || undefined,
+          ownerFirstName: ownerFirstName,
+          ownerLastName: ownerLastName,
+          status: ItemStatus.AVAILABLE,
+          // CORREZIONE QUI: Converti Date in stringa ISO
+          createdAt: new Date().toISOString()
+        };
 
-      // 1. Mostra il messaggio di successo
-      await this.presentToast('Prodotto caricato con successo!');
+        await this.productItemService.addItem(createPayload);
+        await this.presentToast('Prodotto creato!');
+      }
 
-      // 2. Resetta il form e l'immagine
       this.resetForm();
-
-      // 3. Naviga alla dashboard
       this.router.navigate(['/tabs/my-pantry']);
 
     } catch (err) {
       console.error(err);
-      this.errorMessage = 'Errore durante il salvataggio. Riprova.';
+      this.errorMessage = 'Errore durante il salvataggio.';
     } finally {
       this.saving = false;
     }
   }
 
-  // Funzione helper per resettare tutto
   private resetForm() {
+    this.isEditing = false;
+    this.itemId = null;
+    this.pageTitle = 'Nuovo Prodotto';
     this.itemForm = { ...this.initialFormState };
     this.tempImage = undefined;
     this.errorMessage = '';
   }
 
-  // Funzione helper per mostrare il Toast
   async presentToast(message: string) {
     const toast = await this.toastController.create({
       message: message,
-      duration: 2000, // Durata del toast in millisecondi
-      position: 'top' // Posizione del toast
+      duration: 2000,
+      position: 'top'
     });
     await toast.present();
   }
-
 }

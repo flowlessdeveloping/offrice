@@ -4,7 +4,6 @@ import {
   collection,
   addDoc,
   doc,
-  updateDoc,
   deleteDoc,
   getDoc,
   getDocs,
@@ -12,7 +11,9 @@ import {
   where,
   onSnapshot,
   serverTimestamp,
-  orderBy
+  orderBy,
+  updateDoc,
+  Unsubscribe // Assicurati di importare Unsubscribe
 } from 'firebase/firestore';
 import { ProductItem } from 'src/app/model';
 
@@ -30,14 +31,22 @@ export class ProductItemService {
     return addDoc(this.col, data);
   }
 
-  async updateItem(id: string, data: Partial<ProductItem>) {
-    const ref = doc(this.fb.db, 'items', id);
-    return updateDoc(ref, data);
+  // Recupera un singolo prodotto tramite ID
+  async getItemById(id: string): Promise<ProductItem | undefined> {
+    const docRef = doc(this.fb.db, `items/${id}`); // Usa 'items' come collezione
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() } as ProductItem;
+    } else {
+      return undefined;
+    }
   }
 
-  async getItemById(id: string) {
-    const ref = doc(this.fb.db, 'items', id);
-    return getDoc(ref);
+  // Aggiorna un prodotto esistente
+  async updateItem(id: string, data: Partial<ProductItem>): Promise<void> {
+    const docRef = doc(this.fb.db, `items/${id}`);
+    await updateDoc(docRef, data);
   }
 
   async queryAvailable() {
@@ -90,6 +99,30 @@ export class ProductItemService {
   async deleteItem(itemId: string): Promise<void> {
     const docRef = doc(this.fb.db, `items/${itemId}`);
     await deleteDoc(docRef);
+  }
+
+  // Metodo Real-time: Ascolta i cambiamenti e avvisa la pagina
+  subscribeToMyItems(userId: string, callback: (items: ProductItem[]) => void): Unsubscribe {
+    const q = query(
+      this.col,
+      where('ownerId', '==', userId),
+      orderBy('createdAt', 'desc')
+    );
+
+    // onSnapshot attiva la callback ogni volta che i dati cambiano
+    return onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => {
+        const data = doc.data() as ProductItem;
+        return { ...data, id: doc.id };
+      });
+      callback(items);
+    }, (error) => {
+      console.error("Errore listener:", error);
+      // Fallback in caso di errore indice
+      if (error.code === 'failed-precondition') {
+        console.warn('Manca indice, riprova a creare indice dal link in console');
+      }
+    });
   }
 
 }

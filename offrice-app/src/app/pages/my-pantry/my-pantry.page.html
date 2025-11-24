@@ -63,9 +63,9 @@
             </div>
           </ion-label>
 
-          <!-- Indicatore swipe (opzionale, visivo) -->
-          <div slot="end" class="swipe-hint">
-            <!-- CAMBIA QUESTA RIGA: usa [icon] invece di name -->
+          <!-- Indicatore swipe / Menu Opzioni -->
+          <!-- MODIFICA QUI: Chiama openOptions invece di editItem -->
+          <div slot="end" class="swipe-hint" (click)="openOptions(item); $event.stopPropagation()">
             <ion-icon [icon]="ellipsisVertical" color="medium"></ion-icon>
           </div>
         </ion-item>

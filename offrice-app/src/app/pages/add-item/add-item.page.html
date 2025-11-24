@@ -1,4 +1,4 @@
-<app-toolbar title="Nuovo Prodotto"></app-toolbar>
+<app-toolbar [title]="pageTitle"></app-toolbar>
 
 <ion-content [fullscreen]="true">
 
@@ -57,8 +57,7 @@
       <div class="ion-margin-top">
         <ion-button expand="block" class="btn-save" (click)="saveItem()" [disabled]="saving">
           <ion-spinner *ngIf="saving" name="crescent"></ion-spinner>
-          <span *ngIf="!saving">Aggiungi alla Dispensa</span>
-          <span *ngIf="saving">Salvataggio...</span>
+          <span *ngIf="!saving">{{ isEditing ? 'Aggiorna Prodotto' : 'Salva Prodotto' }}</span>
         </ion-button>
 
         <ion-button expand="block" fill="clear" class="btn-cancel" (click)="goToDashboard()" [disabled]="saving">
