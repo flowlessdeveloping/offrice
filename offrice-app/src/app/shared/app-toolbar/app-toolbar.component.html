@@ -1,10 +1,15 @@
 <ion-header>
   <ion-toolbar class="app-toolbar">
-    <ion-title>{{ title }}</ion-title>
-    <div class="profile-icon" *ngIf="showProfileIcon">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-        <circle cx="12" cy="7" r="4"/>
+    <!-- Logo Element -->
+    <div class="app-logo" (click)="goHome()"></div>
+
+    <ion-title style="cursor: pointer;" (click)="goHome()">{{ title }}</ion-title>
+
+    <div class="profile-icon" *ngIf="showProfileIcon" (click)="goToProfile()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
       </svg>
     </div>
   </ion-toolbar>

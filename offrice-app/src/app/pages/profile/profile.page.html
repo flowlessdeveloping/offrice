@@ -1,0 +1,29 @@
+<app-toolbar title="Profilo" [showProfileIcon]="false"></app-toolbar>
+
+<ion-content class="ion-padding">
+    <div class="profile-header">
+        <ion-avatar class="profile-avatar">
+            <img [src]="user?.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" alt="Avatar" />
+        </ion-avatar>
+        <ion-text color="dark">
+            <h2>{{ user?.displayName || 'Utente' }}</h2>
+            <p>{{ user?.email }}</p>
+        </ion-text>
+    </div>
+
+    <ion-list inset="true">
+        <ion-item>
+            <ion-label>
+                <h3>Email</h3>
+                <p>{{ user?.email }}</p>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+
+    <div class="logout-container">
+        <ion-button expand="block" color="danger" (click)="logout()">
+            <ion-icon slot="start" name="log-out-outline"></ion-icon>
+            Logout
+        </ion-button>
+    </div>
+</ion-content>

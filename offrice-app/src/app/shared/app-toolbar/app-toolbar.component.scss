@@ -16,31 +16,6 @@ $color-white: #ffffff;
   z-index: 10;
   background: linear-gradient(135deg, #{$color-dark-blue} 0%, #0f2638 100%);
 
-  /* Left: app logo */
-  &::before {
-    content: '';
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 48px;
-    height: 48px;
-    background-image: url('/assets/logo-white.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    border-radius: 10px;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
-  }
-
-  &::before:hover {
-    transform: translateY(-50%) scale(1.05);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-  }
-
   ion-title {
     font-size: 20px;
     font-weight: 700;
@@ -49,6 +24,32 @@ $color-white: #ffffff;
     margin: 0;
     text-align: center;
     flex: 1;
+  }
+}
+
+/* Logo styles moved from ::before to class */
+.app-logo {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  background-image: url('/assets/logo-white.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  z-index: 20;
+  /* Assicura che sia sopra */
+
+  &:hover {
+    transform: translateY(-50%) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -88,8 +89,16 @@ $color-white: #ffffff;
     min-height: 80px;
     padding: 0 32px;
 
-    &::before { width: 52px; height: 52px; left: 28px; }
-    ion-title { font-size: 22px; }
+    /* Aggiornato selettore da &::before a .app-logo */
+    .app-logo {
+      width: 52px;
+      height: 52px;
+      left: 28px;
+    }
+
+    ion-title {
+      font-size: 22px;
+    }
   }
 
   .profile-icon {
@@ -106,8 +115,16 @@ $color-white: #ffffff;
     min-height: 64px;
     padding: 0 12px;
 
-    &::before { width: 40px; height: 40px; left: 12px; }
-    ion-title { font-size: 18px; }
+    /* Aggiornato selettore da &::before a .app-logo */
+    .app-logo {
+      width: 40px;
+      height: 40px;
+      left: 12px;
+    }
+
+    ion-title {
+      font-size: 18px;
+    }
   }
 
   .profile-icon {
