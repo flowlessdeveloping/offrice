@@ -35,13 +35,18 @@
             <ion-label class="ion-text-wrap">
                 <h2 class="item-title">{{ item.name }}</h2>
 
+                <!-- Visualizzazione Note -->
+                <p *ngIf="item.description" class="item-description">
+                    {{ item.description }}
+                </p>
+
                 <div class="item-details">
                     <!-- Quantità Badge -->
                     <span class="quantity-badge">{{ item.quantity }} {{ item.unit }}</span>
 
                     <!-- Proprietario Evidenziato -->
                     <span class="owner-badge">
-                        <ion-icon [icon]="person" style="font-size: 10px; margin-right: 2px;"></ion-icon>
+                        <ion-icon [icon]="person" class="owner-icon"></ion-icon>
                         {{ item.ownerFirstName }} {{ item.ownerLastName }}
                     </span>
                 </div>

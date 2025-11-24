@@ -65,7 +65,8 @@ export class PantryPage implements OnInit {
           ownerFirstName: item.ownerFirstName,
           ownerLastName: item.ownerLastName,
           quantity: item.quantity,
-          unit: item.unit
+          unit: item.unit,
+          description: item.description
         }));
         this.isLoading = false;
       },

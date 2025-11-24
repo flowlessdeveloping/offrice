@@ -93,6 +93,17 @@ ion-content {
     align-items: center;
 }
 
+.item-description {
+    font-size: 0.85rem;
+    color: var(--ion-color-medium);
+    margin: 4px 0;
+}
+
+.owner-icon {
+    font-size: 10px;
+    margin-right: 2px;
+}
+
 /* --- EMPTY STATE --- */
 .empty-state {
     margin-top: 60px;
