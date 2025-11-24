@@ -16,6 +16,7 @@ import {
   Unsubscribe // Assicurati di importare Unsubscribe
 } from 'firebase/firestore';
 import { ProductItem } from 'src/app/model';
+import { Observable } from 'rxjs'; // Assicurati di importare Observable
 
 @Injectable({ providedIn: 'root' })
 export class ProductItemService {
@@ -125,4 +126,45 @@ export class ProductItemService {
     });
   }
 
+  // Aggiungi questo metodo per recuperare TUTTI gli item (condivisi)
+  getAllItems(): Observable<ProductItem[]> {
+    return new Observable((observer) => {
+      // Ordiniamo per data di creazione decrescente
+      const q = query(this.col, orderBy('createdAt', 'desc'));
+
+      const unsubscribe = onSnapshot(q,
+        (snapshot) => {
+          const items = snapshot.docs.map(doc => {
+            const data = doc.data() as ProductItem;
+            return { ...data, id: doc.id };
+          });
+          observer.next(items);
+        },
+        (error) => {
+          console.error("Errore recupero items globali:", error);
+          observer.error(error);
+        }
+      );
+      return () => unsubscribe();
+    });
+  }
+
+  // Aggiungi questo metodo per recuperare il nome dell'utente
+  async getUserName(userId: string): Promise<string> {
+    if (!userId) return 'Sconosciuto';
+    try {
+      // Cerca nella collezione 'users' il documento con l'ID dell'utente
+      const userDocRef = doc(this.fb.db, 'users', userId);
+      const userSnap = await getDoc(userDocRef);
+
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        // Restituisce il nome, o il display name, o l'email, o un fallback
+        return data['name'] || data['displayName'] || data['email'] || 'Utente';
+      }
+    } catch (error) {
+      console.error('Errore recupero nome utente:', error);
+    }
+    return 'Utente';
+  }
 }

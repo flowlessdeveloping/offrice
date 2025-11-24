@@ -1,0 +1,126 @@
+ion-content {
+    --background: #f4f5f8;
+}
+
+.pantry-list {
+    background: transparent;
+    padding: 10px;
+}
+
+.pantry-item {
+    --background: white;
+    --padding-start: 10px;
+    --padding-end: 10px;
+    --padding-top: 10px;
+    --padding-bottom: 10px;
+    --border-radius: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-radius: 16px;
+    /* Importante per arrotondare l'intera card */
+}
+
+/* --- STILE IMMAGINI --- */
+.item-thumbnail-container {
+    width: 70px;
+    /* Larghezza fissa */
+    height: 70px;
+    /* Altezza fissa */
+    min-width: 70px;
+    /* Impedisce che si schiacci */
+    border-radius: 12px;
+    overflow: hidden;
+    /* Taglia l'immagine se esce */
+    background: #f0f2f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    /* Spazio tra immagine e testo */
+}
+
+.real-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Ritaglia l'immagine per riempire il quadrato senza deformarsi */
+    display: block;
+}
+
+.icon-placeholder {
+    color: #a0aec0;
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* --- STILE TESTO --- */
+.item-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2d3748;
+    margin-bottom: 6px;
+    margin-top: 0;
+}
+
+.item-details {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.quantity-badge {
+    background: #e2e8f0;
+    color: #4a5568;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.owner-badge {
+    background: rgba(var(--ion-color-primary-rgb), 0.1);
+    color: var(--ion-color-primary);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+/* --- EMPTY STATE --- */
+.empty-state {
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .icon-circle {
+        width: 80px;
+        height: 80px;
+        background: #e2e8f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        color: #718096;
+        margin-bottom: 16px;
+    }
+
+    h3 {
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 8px;
+    }
+
+    p {
+        color: #718096;
+        margin: 0;
+    }
+}

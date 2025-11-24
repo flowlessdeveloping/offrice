@@ -1,4 +1,53 @@
-
 <app-toolbar title="Dispensa"></app-toolbar>
-<ion-content [fullscreen]="true">
+
+<ion-content [fullscreen]="true" class="main-content">
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="ion-text-center ion-padding mt-5">
+        <ion-spinner color="primary"></ion-spinner>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && pantryItems.length === 0" class="empty-state ion-text-center ion-padding">
+        <div class="icon-circle">
+            <ion-icon [icon]="fastFood"></ion-icon>
+        </div>
+        <h3>Dispensa vuota</h3>
+        <p>Nessuno ha ancora condiviso nulla.</p>
+    </div>
+
+    <!-- Shared Pantry List (Stile Identico a My Pantry) -->
+    <ion-list *ngIf="!isLoading && pantryItems.length > 0" class="pantry-list">
+
+        <ion-item *ngFor="let item of pantryItems" lines="none" detail="false" class="pantry-item">
+
+            <!-- Thumbnail Intelligente -->
+            <div slot="start" class="item-thumbnail-container">
+                <!-- Se c'è l'immagine -->
+                <img *ngIf="item.imageUrl" [src]="item.imageUrl" class="real-image" />
+
+                <!-- Se NON c'è l'immagine: Icona -->
+                <div *ngIf="!item.imageUrl" class="icon-placeholder">
+                    <ion-icon [icon]="fastFood"></ion-icon>
+                </div>
+            </div>
+
+            <ion-label class="ion-text-wrap">
+                <h2 class="item-title">{{ item.name }}</h2>
+
+                <div class="item-details">
+                    <!-- Quantità Badge -->
+                    <span class="quantity-badge">{{ item.quantity }} {{ item.unit }}</span>
+
+                    <!-- Proprietario Evidenziato -->
+                    <span class="owner-badge">
+                        <ion-icon [icon]="person" style="font-size: 10px; margin-right: 2px;"></ion-icon>
+                        {{ item.ownerFirstName }} {{ item.ownerLastName }}
+                    </span>
+                </div>
+            </ion-label>
+
+        </ion-item>
+
+    </ion-list>
 </ion-content>
