@@ -1,3 +1,7 @@
+<ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+</ion-refresher>
+
 <!-- Loading -->
 <div *ngIf="isLoading" class="ion-text-center ion-padding mt-5">
     <ion-spinner color="primary"></ion-spinner>

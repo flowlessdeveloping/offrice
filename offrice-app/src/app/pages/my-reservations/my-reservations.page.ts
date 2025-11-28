@@ -58,9 +58,12 @@ export class MyReservationsPage implements OnInit {
   }
 
   ngOnInit() {
+    console.log('MyReservationsPage init'); // Debug
     this.loadReservations();
   }
 
+  // ionViewWillEnter scatta solo se è una pagina di routing, non un componente figlio
+  // Ma lo lasciamo per sicurezza se venisse usata come pagina a sé stante
   ionViewWillEnter() {
     this.loadReservations();
   }
@@ -139,5 +142,10 @@ export class MyReservationsPage implements OnInit {
       ]
     });
     toast.present();
+  }
+
+  async handleRefresh(event: any) {
+    await this.loadReservations();
+    event.target.complete();
   }
 }
