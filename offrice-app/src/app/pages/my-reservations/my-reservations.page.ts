@@ -11,7 +11,9 @@ import {
   IonButton,
   IonBadge,
   AlertController,
-  ToastController
+  ToastController,
+  IonRefresher, // <--- Aggiungi questo
+  IonRefresherContent
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { bagHandle, trashOutline, timeOutline, fastFood, close } from 'ionicons/icons'; // Aggiunto 'close'
@@ -36,7 +38,9 @@ import { Timestamp } from 'firebase/firestore';
     IonText,
     IonButton,
     IonBadge,
-    AppToolbarComponent
+    AppToolbarComponent,
+    IonRefresher, // <--- Aggiungi questo
+    IonRefresherContent
   ]
 })
 export class MyReservationsPage implements OnInit {
