@@ -14,6 +14,7 @@ import { ProductItemService } from 'src/app/services/product-item.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { ProductItem } from 'src/app/model';
 import { Unsubscribe } from 'firebase/firestore'; // Importa il tipo Unsubscribe
+import { MyReservationsPage } from '../my-reservations/my-reservations.page';
 
 @Component({
   selector: 'app-my-pantry',
@@ -24,7 +25,7 @@ import { Unsubscribe } from 'firebase/firestore'; // Importa il tipo Unsubscribe
     IonContent, CommonModule, FormsModule, AppToolbarComponent,
     IonFab, IonFabButton, IonIcon, IonSegment, IonSegmentButton, IonLabel,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
-    IonSpinner, IonButton
+    IonSpinner, IonButton, MyReservationsPage
   ]
 })
 export class MyPantryPage implements OnInit, ViewWillEnter, OnDestroy { // Aggiungi OnDestroy

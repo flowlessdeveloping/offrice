@@ -25,7 +25,8 @@
               <ion-item lines="none">
                 <ion-label position="stacked">Unità</ion-label>
                 <ion-select [(ngModel)]="itemForm.unit" interface="popover">
-                  <ion-select-option *ngFor="let u of units" [value]="u">{{u}}</ion-select-option>
+                  <ion-select-option value="g">Grammi (g)</ion-select-option>
+                  <ion-select-option value="pz">Pezzi (pz)</ion-select-option>
                 </ion-select>
               </ion-item>
             </ion-col>

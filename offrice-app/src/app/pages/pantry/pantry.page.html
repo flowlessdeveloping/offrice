@@ -52,6 +52,12 @@
                 </div>
             </ion-label>
 
+            <!-- Tasto Prenota: Visibile solo se NON sono il proprietario -->
+            <ion-button slot="end" fill="clear" (click)="reserveItem(item)"
+                *ngIf="currentUserId && item.ownerUid !== currentUserId">
+                <ion-icon [icon]="bagAddOutline" slot="icon-only" size="large"></ion-icon>
+            </ion-button>
+
         </ion-item>
 
     </ion-list>

@@ -137,3 +137,134 @@ ion-content.page-has-toolbar {
     padding-top: calc(var(--app-toolbar-height) - 8px);
   }
 }
+
+/* --- CUSTOM ALERT STYLES --- */
+.custom-reservation-alert {
+  --background: #ffffff;
+  --backdrop-opacity: 0.6;
+  --width: 90%;
+  --max-width: 350px;
+  --border-radius: 20px;
+  /* Arrotonda molto l'alert */
+
+  .alert-wrapper {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .alert-head {
+    padding-top: 24px;
+    padding-bottom: 12px;
+
+    h2.alert-title {
+      color: var(--ion-color-primary);
+      font-weight: 700;
+      font-size: 1.4rem;
+    }
+  }
+
+  .alert-message {
+    color: #4a5568;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  /* Input personalizzato */
+  .custom-alert-input {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px !important;
+    /* Forza padding */
+    margin-top: 16px;
+    color: #2d3748;
+    font-weight: 600;
+
+    &::placeholder {
+      color: #a0aec0;
+      font-weight: 400;
+    }
+  }
+
+  /* Bottoni */
+  .alert-button-group {
+    padding: 8px 16px 16px 16px;
+    gap: 10px;
+    /* Spazio tra bottoni se affiancati */
+  }
+
+  button.alert-button {
+    border-radius: 10px !important;
+    height: 44px;
+    margin: 0;
+    font-weight: 600;
+    text-transform: none;
+    /* Rimuove maiuscolo forzato */
+
+    .alert-button-inner {
+      justify-content: center;
+    }
+  }
+
+  .alert-button-cancel {
+    color: #718096 !important;
+    background: #f7fafc;
+  }
+
+  .alert-button-confirm {
+    color: white !important;
+    background: var(--ion-color-primary);
+    box-shadow: 0 4px 10px rgba(var(--ion-color-primary-rgb), 0.3);
+  }
+}
+
+/* --- CUSTOM TOAST STYLES (Modern & Minimal) --- */
+.custom-toast {
+  --background: #ffffff;
+  --color: #2d3748;
+  /* Grigio scuro per il testo */
+  --border-radius: 12px;
+  --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  --button-color: #a0aec0;
+  /* Colore icona chiusura */
+
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-top: 16px;
+
+  /* Icona di chiusura */
+  &::part(button) {
+    font-size: 1.1rem;
+    margin-right: 8px;
+  }
+
+  &::part(message) {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+}
+
+/* Successo: Accento Blu/Primary (Coerente con l'app) */
+.custom-toast-success {
+  --border-width: 0 0 0 5px;
+  --border-style: solid;
+  --border-color: var(--ion-color-primary);
+  /* Usa il colore primario dell'app */
+
+  /* Opzionale: icona check via CSS pseudo-element se volessi, ma il bordo basta */
+}
+
+/* Errore: Accento Rosso morbido */
+.custom-toast-error {
+  --border-width: 0 0 0 5px;
+  --border-style: solid;
+  --border-color: #e53e3e;
+  /* Rosso meno acceso */
+}
+
+/* Warning: Accento Arancio */
+.custom-toast-warning {
+  --border-width: 0 0 0 5px;
+  --border-style: solid;
+  --border-color: #dd6b20;
+  /* Arancio scuro */
+}
