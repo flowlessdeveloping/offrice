@@ -6,7 +6,7 @@ import { basket, list, calendar } from 'ionicons/icons';
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
-  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon],
+  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
 })
 export class TabsPage {
   public environmentInjector = inject(EnvironmentInjector);
