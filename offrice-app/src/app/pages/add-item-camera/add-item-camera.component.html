@@ -1,0 +1,76 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Scansione IA</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()" color="medium">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- ANTEPRIMA FOTO -->
+  <div class="image-preview-container" *ngIf="image">
+    <img [src]="image" class="preview-img" />
+
+    <!-- OVERLAY ANALISI -->
+    <div class="analysis-overlay" *ngIf="isAnalyzing">
+      <div class="spinner-wrapper">
+        <ion-spinner color="primary" name="crescent"></ion-spinner>
+      </div>
+      <p>L'IA sta analizzando il prodotto...</p>
+    </div>
+  </div>
+
+  <!-- FORM DATI (Visibile dopo analisi) -->
+  <div class="form-container fade-in" *ngIf="analysisComplete && !isAnalyzing">
+
+    <div class="input-group">
+      <label>Prodotto</label>
+      <div class="custom-input">
+        <ion-input [(ngModel)]="itemData.productName" placeholder="Es. Pasta Barilla"></ion-input>
+      </div>
+    </div>
+
+    <div class="qty-row">
+      <div class="input-group flex-1">
+        <label>Quantità</label>
+        <div class="custom-input">
+          <ion-input type="number" [(ngModel)]="itemData.quantity"></ion-input>
+        </div>
+      </div>
+
+      <div class="input-group flex-1">
+        <label>Unità</label>
+        <div class="custom-input select-wrapper">
+          <ion-select [(ngModel)]="itemData.unit" interface="popover">
+            <ion-select-option *ngFor="let u of units" [value]="u">{{ u }}</ion-select-option>
+          </ion-select>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>Descrizione <span class="optional">(Opzionale)</span></label>
+      <div class="custom-input textarea-wrapper">
+        <ion-textarea [(ngModel)]="itemData.description" rows="3" placeholder="Aggiungi dettagli..."></ion-textarea>
+      </div>
+    </div>
+
+    <div class="actions-container">
+      <ion-button expand="block" color="primary" (click)="confirmAndSave()" class="main-btn">
+        <ion-icon name="checkmark" slot="start"></ion-icon>
+        <p style="color: white;">Conferma e Aggiungi</p>
+      </ion-button>
+
+      <ion-button expand="block" fill="clear" color="medium" (click)="takePhoto()" class="secondary-btn">
+        <ion-icon name="camera" slot="start"></ion-icon>
+        Rifai Foto
+      </ion-button>
+    </div>
+
+  </div>
+
+</ion-content>

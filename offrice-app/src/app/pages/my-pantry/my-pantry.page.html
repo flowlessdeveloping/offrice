@@ -92,9 +92,27 @@
 
 </ion-content>
 
-<!-- FAB Button -->
+<!-- FAB Button Group -->
 <ion-fab *ngIf="currentView === 'pantry'" vertical="bottom" horizontal="end" slot="fixed" class="fab-add">
-  <ion-fab-button (click)="goToAddItem()" color="primary">
+
+  <!-- Pulsante Principale (Trigger) -->
+  <ion-fab-button color="primary">
     <ion-icon [icon]="add"></ion-icon>
   </ion-fab-button>
+
+  <!-- Lista Opzioni -->
+  <ion-fab-list side="top">
+
+    <!-- Opzione 1: Scansiona con Camera -->
+    <ion-fab-button (click)="openCameraScan()" color="secondary" title="Scansiona">
+      <ion-icon [icon]="camera" color="light"></ion-icon>
+    </ion-fab-button>
+
+    <!-- Opzione 2: Aggiungi Manuale -->
+    <ion-fab-button (click)="goToAddItem()" color="light" title="Manuale">
+      <ion-icon [icon]="create"></ion-icon>
+    </ion-fab-button>
+
+  </ion-fab-list>
+
 </ion-fab>

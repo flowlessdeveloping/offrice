@@ -1,20 +1,23 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core'; // Aggiungi OnDestroy
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonButton, IonFab, IonFabButton, IonIcon,
-  IonSegment, IonSegmentButton, IonLabel, IonList, IonItem, IonThumbnail,
-  IonItemSliding, IonItemOptions, IonItemOption, IonText, IonSpinner,
-  AlertController, ToastController, ViewWillEnter, ActionSheetController
+  IonSegment, IonSegmentButton, IonLabel, IonList, IonItem, IonFabList,
+  IonItemSliding, IonItemOptions, IonItemOption, IonSpinner,
+  AlertController, ToastController, ViewWillEnter, ActionSheetController, ModalController,
+  IonRefresher, IonRefresherContent // <--- Aggiunti import Refresher
 } from '@ionic/angular/standalone';
-import { add, trash, create, pricetag, fastFood, ellipsisVertical, close } from 'ionicons/icons';
+import { add, trash, create, pricetag, fastFood, ellipsisVertical, close, camera } from 'ionicons/icons'; // Aggiunto camera
 import { Router } from '@angular/router';
 import { AppToolbarComponent } from 'src/app/shared/app-toolbar/app-toolbar.component';
 import { ProductItemService } from 'src/app/services/product-item.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { ProductItem } from 'src/app/model';
-import { Unsubscribe } from 'firebase/firestore'; // Importa il tipo Unsubscribe
+import { Unsubscribe } from 'firebase/firestore';
 import { MyReservationsPage } from '../my-reservations/my-reservations.page';
+import { AddItemCameraComponent } from '../add-item-camera/add-item-camera.component';
+import { addIcons } from 'ionicons'; // Import necessario per addIcons
 
 @Component({
   selector: 'app-my-pantry',
@@ -25,10 +28,11 @@ import { MyReservationsPage } from '../my-reservations/my-reservations.page';
     IonContent, CommonModule, FormsModule, AppToolbarComponent,
     IonFab, IonFabButton, IonIcon, IonSegment, IonSegmentButton, IonLabel,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
-    IonSpinner, IonButton, MyReservationsPage
+    IonSpinner, IonButton, MyReservationsPage, IonFabList,
+    IonRefresher, IonRefresherContent // <--- Aggiunti ai imports
   ]
 })
-export class MyPantryPage implements OnInit, ViewWillEnter, OnDestroy { // Aggiungi OnDestroy
+export class MyPantryPage implements OnInit, ViewWillEnter, OnDestroy {
 
   public add = add;
   public trash = trash;
@@ -37,6 +41,7 @@ export class MyPantryPage implements OnInit, ViewWillEnter, OnDestroy { // Aggiu
   public fastFood = fastFood;
   public ellipsisVertical = ellipsisVertical;
   public close = close;
+  public camera = camera; // Espongo icona camera
 
   public currentView: 'pantry' | 'reservations' = 'pantry';
   public myItems: ProductItem[] = [];
@@ -48,49 +53,42 @@ export class MyPantryPage implements OnInit, ViewWillEnter, OnDestroy { // Aggiu
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
   private actionSheetCtrl = inject(ActionSheetController);
+  private modalController = inject(ModalController);
 
-  // Variabile per memorizzare la funzione di stop del listener
   private itemsUnsubscribe: Unsubscribe | null = null;
 
-  constructor() { }
+  constructor() {
+    addIcons({ add, trash, create, pricetag, fastFood, ellipsisVertical, close, camera });
+  }
 
   ngOnInit() {
     // ngOnInit viene chiamato solo una volta alla creazione.
-    // Lasciamo il caricamento a ionViewWillEnter per gestire i ritorni.
   }
 
-  // Questo metodo viene eseguito OGNI VOLTA che la pagina diventa visibile
   ionViewWillEnter() {
-    // Se siamo sulla tab dispensa, ricarica i dati
     if (this.currentView === 'pantry') {
       this.startListening();
     }
   }
 
-  // Quando cambi tab o esci dalla pagina
   ionViewWillLeave() {
     this.stopListening();
   }
 
-  // Quando il componente viene distrutto definitivamente
   ngOnDestroy() {
     this.stopListening();
   }
 
   startListening() {
-    // Se c'è già un ascolto attivo, non ne creare un altro
     if (this.itemsUnsubscribe) return;
 
     this.isLoading = true;
     const uid = this.auth.getUserId();
 
     if (uid) {
-      // Ci abboniamo alle modifiche
       this.itemsUnsubscribe = this.productService.subscribeToMyItems(uid, (items) => {
-        // Questa funzione viene chiamata AUTOMATICAMENTE ogni volta che il DB cambia
         this.myItems = items;
         this.isLoading = false;
-        console.log('Lista aggiornata in tempo reale!', items.length);
       });
     } else {
       this.isLoading = false;
@@ -99,7 +97,7 @@ export class MyPantryPage implements OnInit, ViewWillEnter, OnDestroy { // Aggiu
 
   stopListening() {
     if (this.itemsUnsubscribe) {
-      this.itemsUnsubscribe(); // Ferma l'ascolto di Firebase
+      this.itemsUnsubscribe();
       this.itemsUnsubscribe = null;
     }
   }
@@ -133,7 +131,6 @@ export class MyPantryPage implements OnInit, ViewWillEnter, OnDestroy { // Aggiu
     try {
       await this.productService.deleteItem(item.id);
       this.presentToast('Prodotto eliminato.');
-      // Non serve più: this.myItems = this.myItems.filter(...) 
     } catch (error) {
       console.error(error);
       this.presentToast('Errore durante l\'eliminazione.');
@@ -156,7 +153,6 @@ export class MyPantryPage implements OnInit, ViewWillEnter, OnDestroy { // Aggiu
         {
           text: 'Modifica',
           icon: this.create,
-          cssClass: 'action-sheet-edit-btn', // Classe personalizzata per il colore blu
           handler: () => {
             this.editItem(item);
           }
@@ -179,5 +175,37 @@ export class MyPantryPage implements OnInit, ViewWillEnter, OnDestroy { // Aggiu
     });
 
     await actionSheet.present();
+  }
+
+  async openCameraScan() {
+    const modal = await this.modalController.create({
+      component: AddItemCameraComponent
+    });
+
+    modal.onDidDismiss().then((result) => {
+      if (result.data) {
+        // Se ritorna true, ricarica la lista.
+        // Dato che usiamo un listener realtime, l'aggiornamento dovrebbe essere automatico,
+        // ma per sicurezza possiamo forzare un riavvio del listener se necessario.
+        // In questo caso, non serve fare nulla se il listener è attivo.
+        if (!this.itemsUnsubscribe) {
+          this.startListening();
+        }
+      }
+    });
+
+    return await modal.present();
+  }
+
+  // Metodo per il refresher manuale
+  async handleRefresh(event: any) {
+    // Ferma e riavvia il listener per forzare un refresh
+    this.stopListening();
+    this.startListening();
+
+    // Simula un piccolo ritardo per UX
+    setTimeout(() => {
+      event.target.complete();
+    }, 1000);
   }
 }
