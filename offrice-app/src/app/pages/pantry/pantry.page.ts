@@ -11,7 +11,8 @@ import {
   IonText,
   IonButton,
   AlertController,
-  ToastController
+  ToastController,
+  LoadingController // <--- Aggiungi questo
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { fastFood, person, bagAddOutline, close } from 'ionicons/icons'; // Aggiunto 'close'
@@ -35,7 +36,6 @@ import { getAuth } from 'firebase/auth';
     IonLabel,
     IonSpinner,
     IonIcon,
-    IonText,
     IonButton
   ]
 })
@@ -53,7 +53,8 @@ export class PantryPage implements OnInit {
     private productService: ProductItemService,
     private reservationService: ReservationService,
     private alertController: AlertController,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private loadingController: LoadingController // <--- Inject
   ) {
     addIcons({ fastFood, person, bagAddOutline, close });
   }
@@ -170,6 +171,13 @@ export class PantryPage implements OnInit {
   }
 
   async processReservation(user: any, item: any, qty: number) {
+    // Mostra Loading
+    const loading = await this.loadingController.create({
+      message: 'Prenotazione in corso...',
+      spinner: 'crescent'
+    });
+    await loading.present();
+
     try {
       const userInfo = {
         uid: user.uid,
@@ -180,13 +188,14 @@ export class PantryPage implements OnInit {
       await this.reservationService.reserveItem(userInfo, item, qty);
 
       this.showToast('Prenotazione effettuata con successo!', 'success');
-
-      // Ricarica la lista per aggiornare le quantità o rimuovere l'elemento
       this.loadPantryItems();
 
     } catch (error) {
       console.error(error);
       this.showToast('Errore durante la prenotazione.', 'danger');
+    } finally {
+      // Nascondi Loading
+      await loading.dismiss();
     }
   }
 

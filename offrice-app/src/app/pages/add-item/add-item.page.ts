@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonCard, IonCardContent, IonList, IonItem, IonLabel, IonInput, IonGrid, IonRow, IonCol, IonSelect, IonSelectOption, IonTextarea, IonButton, IonSpinner, IonText, IonIcon, ToastController } from '@ionic/angular/standalone';
+import { IonContent, IonCard, IonCardContent, IonList, IonItem, IonLabel, IonInput, IonGrid, IonRow, IonCol, IonSelect, IonSelectOption, IonTextarea, IonButton, IonSpinner, IonText, IonIcon, ToastController, LoadingController } from '@ionic/angular/standalone';
 import { AppToolbarComponent } from 'src/app/shared/app-toolbar/app-toolbar.component';
 import { arrowBackCircle, camera } from 'ionicons/icons';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -70,6 +70,7 @@ export class AddItemPage implements OnInit {
   private photoService = inject(PhotoService);
   private toastController = inject(ToastController);
   private route = inject(ActivatedRoute);
+  private loadingController = inject(LoadingController);
 
   constructor(private router: Router, private productItemService: ProductItemService, private auth: AuthService) { }
 
@@ -106,6 +107,13 @@ export class AddItemPage implements OnInit {
 
   // Carica i dati dal DB e riempie il form
   async loadItemData(id: string) {
+    // Mostra Loading
+    const loading = await this.loadingController.create({
+      message: 'Caricamento dati...',
+      spinner: 'crescent'
+    });
+    await loading.present();
+
     this.saving = true;
     try {
       const item = await this.productItemService.getItemById(id);
@@ -129,6 +137,7 @@ export class AddItemPage implements OnInit {
       this.presentToast('Errore nel caricamento del prodotto.');
     } finally {
       this.saving = false;
+      await loading.dismiss(); // Nascondi Loading
     }
   }
 
@@ -156,6 +165,13 @@ export class AddItemPage implements OnInit {
       this.errorMessage = 'Compila i campi obbligatori: prodotto e quantità (>0).';
       return;
     }
+
+    // Mostra Loading
+    const loading = await this.loadingController.create({
+      message: 'Salvataggio in corso...',
+      spinner: 'crescent'
+    });
+    await loading.present();
 
     this.saving = true;
     try {
@@ -186,6 +202,7 @@ export class AddItemPage implements OnInit {
       if (this.isEditing && this.itemId) {
         // --- AGGIORNAMENTO ---
         await this.productItemService.updateItem(this.itemId, payload);
+        // Nota: presentToast è asincrono, ma non blocca il dismiss
         await this.presentToast('Prodotto aggiornato!');
       } else {
         // --- CREAZIONE ---
@@ -202,6 +219,7 @@ export class AddItemPage implements OnInit {
         };
 
         await this.productItemService.addItem(createPayload);
+        // Nota: presentToast è asincrono, ma non blocca il dismiss
         await this.presentToast('Prodotto creato!');
       }
 
@@ -213,6 +231,7 @@ export class AddItemPage implements OnInit {
       this.errorMessage = 'Errore durante il salvataggio.';
     } finally {
       this.saving = false;
+      await loading.dismiss(); // Nascondi Loading
     }
   }
 

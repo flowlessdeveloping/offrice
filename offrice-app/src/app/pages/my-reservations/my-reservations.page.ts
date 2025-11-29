@@ -13,7 +13,8 @@ import {
   AlertController,
   ToastController,
   IonRefresher, // <--- Aggiungi questo
-  IonRefresherContent
+  IonRefresherContent,
+  LoadingController // <--- Aggiungi questo
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { bagHandle, trashOutline, timeOutline, fastFood, close } from 'ionicons/icons'; // Aggiunto 'close'
@@ -35,10 +36,7 @@ import { Timestamp } from 'firebase/firestore';
     IonLabel,
     IonSpinner,
     IonIcon,
-    IonText,
     IonButton,
-    IonBadge,
-    AppToolbarComponent,
     IonRefresher, // <--- Aggiungi questo
     IonRefresherContent
   ]
@@ -56,7 +54,8 @@ export class MyReservationsPage implements OnInit {
   constructor(
     private reservationService: ReservationService,
     private alertController: AlertController,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private loadingController: LoadingController // <--- Inject
   ) {
     addIcons({ bagHandle, trashOutline, timeOutline, fastFood, close }); // Aggiunto close
   }
@@ -110,12 +109,22 @@ export class MyReservationsPage implements OnInit {
           text: 'Sì, annulla',
           role: 'destructive',
           handler: async () => {
+            // Mostra Loading
+            const loading = await this.loadingController.create({
+              message: 'Annullamento in corso...',
+              spinner: 'crescent'
+            });
+            await loading.present();
+
             try {
               await this.reservationService.cancelReservation(reservation.id);
               this.showToast('Prenotazione annullata.', 'success');
               this.loadReservations();
             } catch (e) {
               this.showToast('Errore durante la cancellazione.', 'danger');
+            } finally {
+              // Nascondi Loading
+              await loading.dismiss();
             }
           }
         }

@@ -23,8 +23,7 @@ export class ReservationService {
   constructor(private fb: FirebaseInitService) { }
 
   /**
-   * Crea una prenotazione e aggiorna la quantità dell'oggetto.
-   * Se la quantità scende a 0, l'oggetto viene aggiornato a 0 (e la UI lo nasconderà).
+   * Crea o aggiorna una prenotazione e aggiorna la quantità dell'oggetto.
    */
   async reserveItem(
     user: { uid: string; firstName: string; lastName: string },
@@ -32,43 +31,68 @@ export class ReservationService {
     quantityToReserve: number
   ) {
     const itemRef = doc(this.fb.db, 'items', item.id);
-    const reservationRef = doc(collection(this.fb.db, 'reservations'));
+
+    // Query per cercare prenotazione esistente
+    const existingResQuery = query(
+      this.col,
+      where('itemId', '==', item.id),
+      where('reservedByUid', '==', user.uid),
+      where('status', '==', 'active') // Assumiamo che solo le attive contino
+    );
 
     try {
       await runTransaction(this.fb.db, async (transaction) => {
-        // 1. Leggi il documento dell'oggetto più recente
+        // 1. Leggi il documento dell'oggetto
         const itemDoc = await transaction.get(itemRef);
         if (!itemDoc.exists()) {
           throw new Error("L'oggetto non esiste più!");
         }
 
         const currentQty = Number(itemDoc.data()['quantity']);
-
         if (currentQty < quantityToReserve) {
           throw new Error("Quantità non sufficiente disponibile!");
         }
 
-        const newQty = currentQty - quantityToReserve;
+        // 2. Cerca prenotazione esistente (dobbiamo eseguire la query prima della transazione o usare getDocs dentro, 
+        // ma getDocs non è supportato direttamente in transaction.get(). 
+        // Tuttavia, per coerenza, possiamo leggere la query PRIMA della transazione, 
+        // ma per sicurezza atomica dovremmo leggere dentro.
+        // Firestore transaction non supporta query. Quindi dobbiamo leggere il doc se conosciamo l'ID, 
+        // oppure accettare un piccolo rischio di race condition o strutturare diversamente (es. ID prenotazione deterministico).
 
-        // 2. Crea l'oggetto prenotazione
-        const reservationData = {
-          itemId: item.id,
-          itemName: item.name,
-          reservedByUid: user.uid,
-          reservedByName: `${user.firstName} ${user.lastName}`,
-          quantity: quantityToReserve,
-          unit: item.unit,
-          createdAt: serverTimestamp(),
-          status: 'active'
-        };
+        // SOLUZIONE MIGLIORE: Usare un ID deterministico per la prenotazione: `reservation_${itemId}_${userId}`
+        const reservationId = `res_${item.id}_${user.uid}`;
+        const reservationRef = doc(this.fb.db, 'reservations', reservationId);
+        const reservationDoc = await transaction.get(reservationRef);
 
-        // 3. Scrivi le modifiche
-        transaction.set(reservationRef, reservationData);
+        const newItemQty = currentQty - quantityToReserve;
 
-        // Aggiorna la quantità. 
-        // Nota: Se newQty è 0, l'oggetto rimane nel DB ma con qtà 0. 
-        // La UI dovrà filtrare gli oggetti con qtà > 0.
-        transaction.update(itemRef, { quantity: newQty });
+        if (reservationDoc.exists()) {
+          // AGGIORNA ESISTENTE
+          const currentResQty = Number(reservationDoc.data()['quantity']);
+          const newResQty = currentResQty + quantityToReserve;
+
+          transaction.update(reservationRef, {
+            quantity: newResQty,
+            updatedAt: serverTimestamp()
+          });
+        } else {
+          // CREA NUOVA
+          const reservationData = {
+            itemId: item.id,
+            itemName: item.name,
+            reservedByUid: user.uid,
+            reservedByName: `${user.firstName} ${user.lastName}`,
+            quantity: quantityToReserve,
+            unit: item.unit,
+            createdAt: serverTimestamp(),
+            status: 'active'
+          };
+          transaction.set(reservationRef, reservationData);
+        }
+
+        // Aggiorna quantità item
+        transaction.update(itemRef, { quantity: newItemQty });
       });
 
       return true;
